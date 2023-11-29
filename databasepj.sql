@@ -11,7 +11,7 @@
  Target Server Version : 80034
  File Encoding         : 65001
 
- Date: 29/11/2023 15:22:44
+ Date: 29/11/2023 22:08:32
 */
 
 SET NAMES utf8mb4;
@@ -51,13 +51,19 @@ CREATE TABLE `commodity`  (
   `category` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `produceDate` datetime(0) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  `s_id` int(0) DEFAULT NULL,
+  `p_id` int(0) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `sid8`(`s_id`) USING BTREE,
+  INDEX `pid8`(`p_id`) USING BTREE,
+  CONSTRAINT `pid8` FOREIGN KEY (`p_id`) REFERENCES `platform` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `sid8` FOREIGN KEY (`s_id`) REFERENCES `shop` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of commodity
 -- ----------------------------
-INSERT INTO `commodity` VALUES (10000001, '蒙牛优酸乳', '食品', '牛牛牛牛牛', '2023-11-29 14:02:21');
+INSERT INTO `commodity` VALUES (10000001, '蒙牛优酸乳', '食品', '牛牛牛牛牛', '2023-11-29 14:02:21', 10000001, 10000001);
 
 -- ----------------------------
 -- Table structure for message
@@ -88,38 +94,21 @@ CREATE TABLE `platform`  (
 INSERT INTO `platform` VALUES (10000001, '天猫');
 
 -- ----------------------------
--- Table structure for platform_commodity
--- ----------------------------
-DROP TABLE IF EXISTS `platform_commodity`;
-CREATE TABLE `platform_commodity`  (
-  `p_id` int(0) NOT NULL,
-  `c_id` int(0) NOT NULL,
-  PRIMARY KEY (`p_id`, `c_id`) USING BTREE,
-  INDEX `cid1`(`c_id`) USING BTREE,
-  CONSTRAINT `cid1` FOREIGN KEY (`c_id`) REFERENCES `commodity` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `pid` FOREIGN KEY (`p_id`) REFERENCES `platform` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of platform_commodity
--- ----------------------------
-INSERT INTO `platform_commodity` VALUES (10000001, 10000001);
-
--- ----------------------------
 -- Table structure for price
 -- ----------------------------
 DROP TABLE IF EXISTS `price`;
 CREATE TABLE `price`  (
   `c_id` int(0) NOT NULL,
   `price` decimal(10, 2) DEFAULT NULL,
-  `time` datetime(0) DEFAULT NULL,
-  PRIMARY KEY (`c_id`) USING BTREE,
+  `time` datetime(0) NOT NULL,
+  PRIMARY KEY (`c_id`, `time`) USING BTREE,
   CONSTRAINT `cid2` FOREIGN KEY (`c_id`) REFERENCES `commodity` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of price
 -- ----------------------------
+INSERT INTO `price` VALUES (10000001, 200.00, '2023-11-14 21:40:07');
 INSERT INTO `price` VALUES (10000001, 100.00, '2023-11-29 15:16:36');
 
 -- ----------------------------
@@ -140,24 +129,6 @@ CREATE TABLE `shop`  (
 -- Records of shop
 -- ----------------------------
 INSERT INTO `shop` VALUES (10000001, '李四的商店', '复旦大学', 10000002);
-
--- ----------------------------
--- Table structure for shop_commodity
--- ----------------------------
-DROP TABLE IF EXISTS `shop_commodity`;
-CREATE TABLE `shop_commodity`  (
-  `s_id` int(0) NOT NULL,
-  `c_id` int(0) NOT NULL,
-  PRIMARY KEY (`s_id`, `c_id`) USING BTREE,
-  INDEX `cid`(`c_id`) USING BTREE,
-  CONSTRAINT `cid` FOREIGN KEY (`c_id`) REFERENCES `commodity` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `sid` FOREIGN KEY (`s_id`) REFERENCES `shop` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of shop_commodity
--- ----------------------------
-INSERT INTO `shop_commodity` VALUES (10000001, 10000001);
 
 -- ----------------------------
 -- Table structure for user
