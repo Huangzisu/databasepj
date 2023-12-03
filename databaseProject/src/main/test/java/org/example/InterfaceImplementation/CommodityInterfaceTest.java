@@ -52,5 +52,25 @@ class CommodityInterfaceTest {
         Integer result2 = CommodityInterface.updateCommodityPrice(10000001, 1500);
         assertEquals(1, result2);
     }
-
+    @Test
+    public void administratorUpdateCommodityInfo() {
+        Integer result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
+                "update_administrator", "2020-12-03", 10000002, 10000001);
+        assertEquals(-1, result);
+        result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
+                "update_administrator", "2020-12-03", 10000001, 10000002);
+        assertEquals(-1, result);
+        result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
+                "update_administrator", "2020-12-03", 10000001, 10000001);
+        assertEquals(1, result);
+    }
+    @Test
+    public void getMostPopularCommodityId(){
+        try{
+            Integer result = CommodityInterface.getMostPopularCommodityId();
+            System.out.println(result);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

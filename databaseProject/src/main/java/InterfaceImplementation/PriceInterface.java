@@ -25,4 +25,5 @@ public class PriceInterface {
         }
         return result;
     }
+
 }

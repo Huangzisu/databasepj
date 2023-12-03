@@ -206,6 +206,60 @@ public class CommodityInterface {
         return priceArrayList;
     }
 
+    public static Integer administratorUpdateCommodityInfo(Integer id, String name, String category, String description,
+                                              String produceDate, Integer s_id, Integer p_id) {
+        Integer result = 0;
+        try {
+            Connection conn = SqlConnection.getConnection();
+
+            String updateCommoditySql = "UPDATE commodity SET name = ?, category = ?, description = ?, " +
+                    "produceDate = ?, s_id = ?, p_id = ? WHERE id = ?";
+            // 插入新商品
+            PreparedStatement updateCommodityStmt = conn.prepareStatement(updateCommoditySql);
+            updateCommodityStmt.setString(1, name);
+            updateCommodityStmt.setString(2, category);
+            updateCommodityStmt.setString(3, description);
+            updateCommodityStmt.setString(4, produceDate);
+            updateCommodityStmt.setInt(5, s_id);
+            updateCommodityStmt.setInt(6, p_id);
+            updateCommodityStmt.setInt(7, id);
+
+            result = updateCommodityStmt.executeUpdate();
+
+            conn.close();
+            if(result != 1){
+                return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+
+    public static Integer getMostPopularCommodityId(){
+        Integer resultId = -1;
+        try{
+            Connection conn = SqlConnection.getConnection();
+
+            String sql = "SELECT c_id, COUNT(c_id) AS count\n" +
+                    "FROM collection_commodity\n" +
+                    "GROUP BY c_id\n" +
+                    "ORDER BY count DESC\n" +
+                    "LIMIT 1;";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet resultSet = pstmt.executeQuery();
+            if(resultSet.next()){
+                resultId = resultSet.getInt("c_id");
+            }
+            conn.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return resultId;
+    }
+
+
     public static Timestamp convertToTimestamp(String timestampString) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
