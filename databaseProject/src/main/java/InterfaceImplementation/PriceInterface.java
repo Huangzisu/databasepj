@@ -1,14 +1,18 @@
 package InterfaceImplementation;
 
-import Entity.Price;
-import Entity.User;
+
 import SqlOperation.SqlConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import Entity.Price;
+import Entity.User;
 import java.util.ArrayList;
 
 import static InterfaceImplementation.CommodityInterface.getCommodityPriceHistory;
+
 
 /**
  * @Description：
@@ -29,6 +33,7 @@ public class PriceInterface {
         }
         return result;
     }
+
     public static ArrayList<Price> getHistoryPrice(Integer cId, User user,int option) throws SQLException, ClassNotFoundException {
         ArrayList<Price> priceArrayList = new ArrayList<>();
         if(user.getRole() !=0){
@@ -38,4 +43,5 @@ public class PriceInterface {
         priceArrayList = getCommodityPriceHistory(con,cId,option);
         return priceArrayList;
     }
+
 }

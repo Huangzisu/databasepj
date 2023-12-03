@@ -31,7 +31,7 @@ class CommodityInterfaceTest {
     public void getCommodityPriceHistory(){
         try{
             Connection conn = SqlConnection.getConnection();
-            ArrayList<Price> priceHistory = CommodityInterface.getCommodityPriceHistory(conn, 10000001);
+            ArrayList<Price> priceHistory = CommodityInterface.getCommodityPriceHistory(conn, 10000001, 0);
             for(Price price : priceHistory){
                 System.out.println(price.getcId() + " " + price.getPrice() + " " + price.getTime());
             }
@@ -51,6 +51,28 @@ class CommodityInterfaceTest {
         assertEquals(-2, result);
         Integer result2 = CommodityInterface.updateCommodityPrice(10000001, 1500);
         assertEquals(1, result2);
+    }
+
+    @Test
+    public void administratorUpdateCommodityInfo() {
+        Integer result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
+                "update_administrator", "2020-12-03", 10000002, 10000001);
+        assertEquals(-1, result);
+        result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
+                "update_administrator", "2020-12-03", 10000001, 10000002);
+        assertEquals(-1, result);
+        result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
+                "update_administrator", "2020-12-03", 10000001, 10000001);
+        assertEquals(1, result);
+    }
+    @Test
+    public void getMostPopularCommodityId(){
+        try{
+            Integer result = CollectionInterface.getMostPopularCommodityId();
+            System.out.println(result);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

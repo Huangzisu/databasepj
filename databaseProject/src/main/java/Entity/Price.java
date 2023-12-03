@@ -3,6 +3,7 @@ package Entity;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+
 /**
  * @Description：
  * @Author Huangzisu
@@ -17,6 +18,7 @@ public class Price {
         this.price = price;
         this.time = time;
     }
+
 
     public static float getMaxPrice(ArrayList<Price> priceList){
         float maxPrice = 0;

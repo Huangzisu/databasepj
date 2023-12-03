@@ -33,4 +33,22 @@ public class ShopInterface {
         return shop;
     }
 
+    public static Integer updateShopInfo(Integer id, String name, String address){
+        Integer result = 0;
+        try{
+            Connection con = SqlConnection.getConnection();
+            String sql = "UPDATE shop SET name = ?, address = ? WHERE id = " + id;
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1,name);
+            pstmt.setString(2,address);
+            result = pstmt.executeUpdate();
+            pstmt.close();
+            con.close();
+            if(result != 1)  return -1;
+        }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
 }

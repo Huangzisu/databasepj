@@ -135,6 +135,7 @@ public class CommodityInterface {
             updateCommodityStmt.setString(1, name);
             updateCommodityStmt.setString(2, category);
             updateCommodityStmt.setString(3, description);
+            updateCommodityStmt.setString(4, produceDate);
             updateCommodityStmt.setInt(5, id);
 
             result = updateCommodityStmt.executeUpdate();
@@ -156,7 +157,9 @@ public class CommodityInterface {
             Connection conn = SqlConnection.getConnection();
 
             // 查询目标商品价格历史，判断是否满足更新条件
+
             ArrayList<Price> priceArrayList = getCommodityPriceHistory(conn, id,0);
+
             if(priceArrayList == null || priceArrayList.size() < 1) { // 未查询到商品价格历史
                 return -1;
             }
@@ -208,6 +211,38 @@ public class CommodityInterface {
         return priceArrayList;
     }
 
+
+    public static Integer administratorUpdateCommodityInfo(Integer id, String name, String category, String description,
+                                              String produceDate, Integer s_id, Integer p_id) {
+        Integer result = 0;
+        try {
+            Connection conn = SqlConnection.getConnection();
+
+            String updateCommoditySql = "UPDATE commodity SET name = ?, category = ?, description = ?, " +
+                    "produceDate = ?, s_id = ?, p_id = ? WHERE id = ?";
+            // 插入新商品
+            PreparedStatement updateCommodityStmt = conn.prepareStatement(updateCommoditySql);
+            updateCommodityStmt.setString(1, name);
+            updateCommodityStmt.setString(2, category);
+            updateCommodityStmt.setString(3, description);
+            updateCommodityStmt.setString(4, produceDate);
+            updateCommodityStmt.setInt(5, s_id);
+            updateCommodityStmt.setInt(6, p_id);
+            updateCommodityStmt.setInt(7, id);
+
+            result = updateCommodityStmt.executeUpdate();
+
+            conn.close();
+            if(result != 1){
+                return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+
     public static Timestamp convertToTimestamp(String timestampString) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -230,6 +265,7 @@ public class CommodityInterface {
         }
         return false;
     }
+
     public static Boolean batchImportCommodity(String path) throws SQLException {
         Connection con = null;
         try {
@@ -251,4 +287,5 @@ public class CommodityInterface {
         }
         return true;
     }
-    }
+}
+
