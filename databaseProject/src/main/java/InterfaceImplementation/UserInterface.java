@@ -29,34 +29,7 @@ public class UserInterface {
         }
     }
 
-    public static int setFloorPrice(float floorPrice,User user) throws SQLException, ClassNotFoundException {
-        int returnValue=0;
-        if(user.getRole()==0){
-            Connection con = SqlConnection.getConnection();
-            Statement stmt = con.createStatement();
-            ResultSet resultSet = stmt.executeQuery("select * from collection_floorprice where u_id="+ user.getId());
-            if(!resultSet.next()){
-                String sql = "INSERT INTO collection_floorprice (u_id,floorPrice) VALUES (?, ?)";
-                PreparedStatement pstmt = con.prepareStatement(sql);
-                pstmt.setInt(1,user.getId());
-                pstmt.setFloat(2,floorPrice);
-                pstmt.executeUpdate();
-            }
-            else{
-                String sql = "UPDATE collection_floorprice SET floorprice = ? WHERE u_id = " + user.getId();
-                PreparedStatement pstmt = con.prepareStatement(sql);
-                pstmt.setFloat(1,floorPrice);
-                pstmt.executeUpdate();
-            }
-            stmt.close();
-            con.close();
-            returnValue=1;
-        }
-        else{
-            returnValue=-1;
-        }
-        return returnValue;
-    }
+
 
     public static void getUserInfo(User user){
         System.out.println("id:"+user.getId());

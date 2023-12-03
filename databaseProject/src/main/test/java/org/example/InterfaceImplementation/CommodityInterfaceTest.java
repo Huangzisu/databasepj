@@ -31,7 +31,7 @@ class CommodityInterfaceTest {
     public void getCommodityPriceHistory(){
         try{
             Connection conn = SqlConnection.getConnection();
-            ArrayList<Price> priceHistory = CommodityInterface.getCommodityPriceHistory(conn, 10000001);
+            ArrayList<Price> priceHistory = CommodityInterface.getCommodityPriceHistory(conn, 10000001, 0);
             for(Price price : priceHistory){
                 System.out.println(price.getcId() + " " + price.getPrice() + " " + price.getTime());
             }
@@ -52,6 +52,7 @@ class CommodityInterfaceTest {
         Integer result2 = CommodityInterface.updateCommodityPrice(10000001, 1500);
         assertEquals(1, result2);
     }
+
     @Test
     public void administratorUpdateCommodityInfo() {
         Integer result = CommodityInterface.administratorUpdateCommodityInfo(10000004, "update_administrator", "update_administrator",
@@ -73,4 +74,5 @@ class CommodityInterfaceTest {
             e.printStackTrace();
         }
     }
+
 }

@@ -157,7 +157,9 @@ public class CommodityInterface {
             Connection conn = SqlConnection.getConnection();
 
             // 查询目标商品价格历史，判断是否满足更新条件
-            ArrayList<Price> priceArrayList = getCommodityPriceHistory(conn, id);
+
+            ArrayList<Price> priceArrayList = getCommodityPriceHistory(conn, id,0);
+
             if(priceArrayList == null || priceArrayList.size() < 1) { // 未查询到商品价格历史
                 return -1;
             }
@@ -184,11 +186,14 @@ public class CommodityInterface {
         return 1;
     }
 
-    public static ArrayList<Price> getCommodityPriceHistory(Connection conn, Integer id) {
+    public static ArrayList<Price> getCommodityPriceHistory(Connection conn, Integer id,int option) {
+        //option用来设置查询范围，0代表所有日期，1代表近一星期，2代表近一月，3代表近一年
+        String[] timeRange = {"","and time > DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+                "and time > DATE_SUB(CURDATE(), INTERVAL 1 MONTH)","and time > DATE_SUB(CURDATE(), INTERVAL 1 YEAR)"};
         ArrayList<Price> priceArrayList = new ArrayList<>();
         try {
             // 查询目标商品价格历史，判断是否满足更新条件
-            String selectPriceSql = "SELECT * FROM price WHERE c_id = ? ORDER BY time DESC";
+            String selectPriceSql = "SELECT * FROM price WHERE c_id = ?"+timeRange[option]+" ORDER BY time DESC";
 
             PreparedStatement selectPriceStmt = conn.prepareStatement(selectPriceSql);
             selectPriceStmt.setInt(1, id);
@@ -205,6 +210,7 @@ public class CommodityInterface {
         }
         return priceArrayList;
     }
+
 
     public static Integer administratorUpdateCommodityInfo(Integer id, String name, String category, String description,
                                               String produceDate, Integer s_id, Integer p_id) {
@@ -260,6 +266,7 @@ public class CommodityInterface {
     }
 
 
+
     public static Timestamp convertToTimestamp(String timestampString) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -282,4 +289,27 @@ public class CommodityInterface {
         }
         return false;
     }
+
+    public static Boolean batchImportCommodity(String path) throws SQLException {
+        Connection con = null;
+        try {
+            con = SqlConnection.getConnection();
+            con.setAutoCommit(false);
+            String sql = "LOAD DATA LOCAL INFILE ? INTO TABLE commodity FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' (name, category,description,produceDate, shopId, price, platformId)";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, path);
+            pstmt.executeUpdate();
+            con.commit();
+            pstmt.close();
+            con.setAutoCommit(true);
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            con.rollback();
+            con.setAutoCommit(true);
+            return false;
+        }
+        return true;
+    }
 }
+
