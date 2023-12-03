@@ -243,30 +243,6 @@ public class CommodityInterface {
         return 1;
     }
 
-    public static Integer getMostPopularCommodityId(){
-        Integer resultId = -1;
-        try{
-            Connection conn = SqlConnection.getConnection();
-
-            String sql = "SELECT c_id, COUNT(c_id) AS count\n" +
-                    "FROM collection_commodity\n" +
-                    "GROUP BY c_id\n" +
-                    "ORDER BY count DESC\n" +
-                    "LIMIT 1;";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet resultSet = pstmt.executeQuery();
-            if(resultSet.next()){
-                resultId = resultSet.getInt("c_id");
-            }
-            conn.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return resultId;
-    }
-
-
-
     public static Timestamp convertToTimestamp(String timestampString) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -17,7 +17,7 @@ public class CollectionInterface {
             try {
                 con = SqlConnection.getConnection();
                 con.setAutoCommit(false); // 关闭自动提交
-                String sqlInsert = "INSERT INTO collection_commodity (u_id, c_id) VALUES (?, ?)";
+                String sqlInsert = "INSERT INTO collection (u_id, c_id) VALUES (?, ?)";
                 pstmt = con.prepareStatement(sqlInsert);
                 pstmt.setInt(1, user.getId());
                 pstmt.setInt(2, cId);
@@ -57,20 +57,10 @@ public class CollectionInterface {
                 con = SqlConnection.getConnection();
                 con.setAutoCommit(false); // 关闭自动提交
 
-                stmt = con.createStatement();
-                resultSet = stmt.executeQuery("SELECT * FROM collection_floorprice WHERE u_id=" + user.getId());
-
-                if (!resultSet.next()) {
-                    String sqlInsert = "INSERT INTO collection_floorprice (u_id, floorPrice) VALUES (?, ?)";
-                    pstmt = con.prepareStatement(sqlInsert);
-                    pstmt.setInt(1, user.getId());
-                    pstmt.setFloat(2, floorPrice);
-                } else {
-                    String sqlUpdate = "UPDATE collection_floorprice SET floorprice = ? WHERE u_id = ?";
-                    pstmt = con.prepareStatement(sqlUpdate);
-                    pstmt.setFloat(1, floorPrice);
-                    pstmt.setInt(2, user.getId());
-                }
+                String sql = "UPDATE collection SET floorPrice = ? WHERE u_id = ?";
+                pstmt = con.prepareStatement(sql);
+                pstmt.setFloat(1, floorPrice);
+                pstmt.setInt(2, user.getId());
 
                 pstmt.executeUpdate();
                 con.commit(); // 提交事务
@@ -94,5 +84,27 @@ public class CollectionInterface {
         }
 
         return returnValue;
+    }
+
+    public static Integer getMostPopularCommodityId(){
+        Integer resultId = -1;
+        try{
+            Connection conn = SqlConnection.getConnection();
+
+            String sql = "SELECT c_id, COUNT(c_id) AS count\n" +
+                    "FROM collection\n" +
+                    "GROUP BY c_id\n" +
+                    "ORDER BY count DESC\n" +
+                    "LIMIT 1;";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet resultSet = pstmt.executeQuery();
+            if(resultSet.next()){
+                resultId = resultSet.getInt("c_id");
+            }
+            conn.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return resultId;
     }
 }

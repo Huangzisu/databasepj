@@ -68,7 +68,7 @@ class CommodityInterfaceTest {
     @Test
     public void getMostPopularCommodityId(){
         try{
-            Integer result = CommodityInterface.getMostPopularCommodityId();
+            Integer result = CollectionInterface.getMostPopularCommodityId();
             System.out.println(result);
         }catch (Exception e){
             e.printStackTrace();
