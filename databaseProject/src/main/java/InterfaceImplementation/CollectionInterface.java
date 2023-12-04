@@ -24,7 +24,7 @@ public class CollectionInterface {
                 pstmt.executeUpdate();
                 con.commit(); // 提交事务
                 returnValue = 1;
-                }
+            }
             catch (SQLException e) {
                 if (con != null) {
                     con.rollback(); // 发生异常，回滚事务
