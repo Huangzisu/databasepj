@@ -1,9 +1,6 @@
 package InterfaceImplementation;
 
-import Entity.Commodity;
-import Entity.DetailedCommodity;
-import Entity.Price;
-import Entity.User;
+import Entity.*;
 import SqlOperation.SqlConnection;
 
 import java.sql.*;
@@ -33,7 +30,8 @@ public class CommodityInterface {
         if(resultSet.next()){
             do{
                 commodityArrayList.add(new Commodity(resultSet.getInt("id"), resultSet.getString("commodityName"),
-                        resultSet.getInt("price"), resultSet.getString("shopName"), resultSet.getString("platformName")));
+                        resultSet.getInt("price"), resultSet.getString("shopName"), resultSet.getString("platformName"),
+                        resultSet.getString("origin")));
             }while(resultSet.next());
         }
         pstmt.close();
@@ -41,27 +39,25 @@ public class CommodityInterface {
         return commodityArrayList;
     }
 
-    public static DetailedCommodity getDetailedCommodityInfo(int id, User user) throws SQLException, ClassNotFoundException {
-        if(user.getRole()!=0){
-            return null;
-        }
+    public static DetailedCommodity getDetailedCommodityInfo(int id) throws SQLException, ClassNotFoundException {
         Connection con = SqlConnection.getConnection();
-        String sql = "SELECT t1.id, t1.name as commodityName,t1.category,t1.produceDate,t1.description ,t2.name as platformName, t3.name as shopName, t3.address,t4.price"
-                +"FROM commodity t1"
-                +"INNER JOIN platform t2 ON t1.p_id = t2.id"
-                +"INNER JOIN shop t3 ON t1.s_id = t3.id"
-                +"INNER JOIN price t4 ON t4.c_id = t1.id"
-                +"WHERE t1.id=? AND t4.time = ("
-                +"SELECT MAX(time)"
-                +"FROM price"
-                +"WHERE c_id = t1.id)";
+        String sql = "SELECT t1.id, t1.name as commodityName, t1.category, t1.produceDate, t1.description, t1.origin, t2.name as platformName, t3.name as shopName, t3.address, t4.price "
+                + "FROM commodity t1 "
+                + "INNER JOIN platform t2 ON t1.p_id = t2.id "
+                + "INNER JOIN shop t3 ON t1.s_id = t3.id "
+                + "INNER JOIN price t4 ON t4.c_id = t1.id "
+                + "WHERE t1.id=? AND t4.time = ( "
+                + "    SELECT MAX(time) "
+                + "    FROM price "
+                + "    WHERE c_id = t1.id)";
+
         PreparedStatement pstmt = con.prepareStatement(sql);
         pstmt.setInt(1, id);
         ResultSet resultSet = pstmt.executeQuery();
         if(resultSet.next()){
             DetailedCommodity detailedCommodity = new DetailedCommodity(resultSet.getInt("id"), resultSet.getString("commodityName"),
                     resultSet.getInt("price"), resultSet.getString("shopName"), resultSet.getString("platformName"),
-                    resultSet.getString("category"), resultSet.getString("description"), resultSet.getString("produceDate"),
+                    resultSet.getString("origin"), resultSet.getString("category"), resultSet.getString("description"), resultSet.getString("produceDate"),
                     resultSet.getString("shopName"), resultSet.getString("address"));
             pstmt.close();
             con.close();
@@ -75,22 +71,23 @@ public class CommodityInterface {
     }
 
     public static Integer releaseNewCommodity(String name, String category, String description,
-                                              String produceDate, Integer shopId, Integer price, Integer platformId) {
+                                              String produceDate, String origin, Integer shopId, Integer price, Integer platformId) {
         Connection conn = null;
         try {
             conn = SqlConnection.getConnection();
             // 关闭自动提交
             conn.setAutoCommit(false);
-            String insertCommoditySql = "INSERT INTO commodity (name, category, description, produceDate, " +
-                    "s_id, p_id) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertCommoditySql = "INSERT INTO commodity (name, category, description, produceDate, origin" +
+                    "s_id, p_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             // 插入新商品
             PreparedStatement insertCommodityStmt = conn.prepareStatement(insertCommoditySql, Statement.RETURN_GENERATED_KEYS);
             insertCommodityStmt.setString(1, name);
             insertCommodityStmt.setString(2, category);
             insertCommodityStmt.setString(3, description);
             insertCommodityStmt.setString(4, produceDate);
-            insertCommodityStmt.setInt(5, shopId);
-            insertCommodityStmt.setInt(6, platformId);
+            insertCommodityStmt.setString(5, origin);
+            insertCommodityStmt.setInt(6, shopId);
+            insertCommodityStmt.setInt(7, platformId);
 
             insertCommodityStmt.executeUpdate();
             ResultSet generatedKeys = insertCommodityStmt.getGeneratedKeys();
@@ -123,20 +120,21 @@ public class CommodityInterface {
     }
 
     public static Integer updateCommodityInfo(Integer id, String name, String category, String description,
-                                              String produceDate) {
+                                              String produceDate, String origin) {
         Integer result = 0;
         try {
             Connection conn = SqlConnection.getConnection();
 
-            String updateCommoditySql = "UPDATE commodity SET name = ?, category = ?, description = ?, " +
-                    "produceDate = ? WHERE id = ?";
+            String updateCommoditySql = "UPDATE commodity SET name = ?, category = ?, description = ?," +
+                    "produceDate = ?, origin = ? WHERE id = ?";
             // 插入新商品
             PreparedStatement updateCommodityStmt = conn.prepareStatement(updateCommoditySql);
             updateCommodityStmt.setString(1, name);
             updateCommodityStmt.setString(2, category);
             updateCommodityStmt.setString(3, description);
             updateCommodityStmt.setString(4, produceDate);
-            updateCommodityStmt.setInt(5, id);
+            updateCommodityStmt.setString(5, origin);
+            updateCommodityStmt.setInt(6, id);
 
             result = updateCommodityStmt.executeUpdate();
 
@@ -213,22 +211,29 @@ public class CommodityInterface {
 
 
     public static Integer administratorUpdateCommodityInfo(Integer id, String name, String category, String description,
-                                                           String produceDate, Integer s_id, Integer p_id) {
+                                                           String produceDate, String origin, String shopName, String platformName) {
         Integer result = 0;
         try {
             Connection conn = SqlConnection.getConnection();
 
+            Shop shop = ShopInterface.getShopInfoByName(shopName);
+            Platform platform = PlatformInterface.getPlatformByName(platformName);
+            if(shop == null || platform == null){
+                return -1;
+            }
+
             String updateCommoditySql = "UPDATE commodity SET name = ?, category = ?, description = ?, " +
-                    "produceDate = ?, s_id = ?, p_id = ? WHERE id = ?";
+                    "produceDate = ?, origin = ?, s_id = ?, p_id = ? WHERE id = ?";
             // 插入新商品
             PreparedStatement updateCommodityStmt = conn.prepareStatement(updateCommoditySql);
             updateCommodityStmt.setString(1, name);
             updateCommodityStmt.setString(2, category);
             updateCommodityStmt.setString(3, description);
             updateCommodityStmt.setString(4, produceDate);
-            updateCommodityStmt.setInt(5, s_id);
-            updateCommodityStmt.setInt(6, p_id);
-            updateCommodityStmt.setInt(7, id);
+            updateCommodityStmt.setString(5, origin);
+            updateCommodityStmt.setInt(6, shop.getId());
+            updateCommodityStmt.setInt(7, platform.getId());
+            updateCommodityStmt.setInt(8, id);
 
             result = updateCommodityStmt.executeUpdate();
 
@@ -271,7 +276,7 @@ public class CommodityInterface {
         try {
             con = SqlConnection.getConnection();
             con.setAutoCommit(false);
-            String sql = "LOAD DATA LOCAL INFILE ? INTO TABLE commodity FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' (name, category,description,produceDate, shopId, price, platformId)";
+            String sql = "LOAD DATA LOCAL INFILE ? INTO TABLE commodity FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' (name, category,description,produceDate, origin, shopId, price, platformId)";
             PreparedStatement pstmt = con.prepareStatement(sql);
             pstmt.setString(1, path);
             pstmt.executeUpdate();
