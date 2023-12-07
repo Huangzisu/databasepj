@@ -281,7 +281,7 @@ public class AdministratorPage {
             contentText.append("ID: ").append(commodity.getId()).append("\n");
             contentText.append("名称: ").append(commodity.getName()).append("\n");
             contentText.append("价格: ").append(commodity.getPrice()).append("\n");
-            contentText.append("商家: ").append(commodity.getShopName()).append("\n");
+            contentText.append("商家: ").append(commodity.getShop()).append("\n");
             contentText.append("平台: ").append(commodity.getPlatform()).append("\n");
             contentText.append("类别: ").append(commodity.getCategory()).append("\n");
             contentText.append("描述: ").append(commodity.getDescription()).append("\n");

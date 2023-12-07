@@ -8,13 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class CommodityInterface {
-    public static ArrayList<Commodity> searchCommodity(String name, User user) throws SQLException, ClassNotFoundException {
-        if(user.getRole()!=0){
-            return null;
-        }
+    public static ArrayList<Commodity> searchCommodity(String name) throws SQLException, ClassNotFoundException {
         ArrayList<Commodity> commodityArrayList = new ArrayList<>();
         Connection con = SqlConnection.getConnection();
-        String sql = "SELECT t1.id, t1.name as commodityName, t2.name as platformName, t3.name as shopName, t4.price " +
+        String sql = "SELECT t1.id, t1.name as commodityName, t2.name as platformName, t3.name as shopName, t4.price, t1.origin " +
                 "FROM commodity t1 " +
                 "INNER JOIN platform t2 ON t1.p_id = t2.id " +
                 "INNER JOIN shop t3 ON t1.s_id = t3.id " +
@@ -25,13 +22,12 @@ public class CommodityInterface {
                 "WHERE c_id = t1.id)";
 
         PreparedStatement pstmt = con.prepareStatement(sql);
-        pstmt.setString(1, "%" + name + "%");
+        pstmt.setString(1, "%" + name + "%");  // 正确的方式，不需要额外的单引号
         ResultSet resultSet = pstmt.executeQuery();
         if(resultSet.next()){
             do{
                 commodityArrayList.add(new Commodity(resultSet.getInt("id"), resultSet.getString("commodityName"),
-                        resultSet.getInt("price"), resultSet.getString("shopName"), resultSet.getString("platformName"),
-                        resultSet.getString("origin")));
+                        resultSet.getDouble("price"), resultSet.getString("shopName"), resultSet.getString("platformName"),resultSet.getString("origin")));
             }while(resultSet.next());
         }
         pstmt.close();
@@ -56,9 +52,8 @@ public class CommodityInterface {
         ResultSet resultSet = pstmt.executeQuery();
         if(resultSet.next()){
             DetailedCommodity detailedCommodity = new DetailedCommodity(resultSet.getInt("id"), resultSet.getString("commodityName"),
-                    resultSet.getInt("price"), resultSet.getString("shopName"), resultSet.getString("platformName"),
-                    resultSet.getString("origin"), resultSet.getString("category"), resultSet.getString("description"), resultSet.getString("produceDate"),
-                    resultSet.getString("shopName"), resultSet.getString("address"));
+                    resultSet.getDouble("price"), resultSet.getString("shopName"), resultSet.getString("platformName"),resultSet.getString("origin"),
+                    resultSet.getString("category"), resultSet.getString("description"), resultSet.getString("produceDate"), resultSet.getString("address"));
             pstmt.close();
             con.close();
             return detailedCommodity;

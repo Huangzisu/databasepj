@@ -11,17 +11,17 @@ import java.util.ArrayList;
  **/
 public class Price {
     private Integer cId;
-    private Integer price;
+    private double price;
     private String time;
-    public Price(Integer cId, Integer price, String time) {
+    public Price(Integer cId, double price, String time) {
         this.cId = cId;
         this.price = price;
         this.time = time;
     }
 
 
-    public static float getMaxPrice(ArrayList<Price> priceList){
-        float maxPrice = 0;
+    public static double getMaxPrice(ArrayList<Price> priceList){
+        double maxPrice = 0;
         for (Price price : priceList) {
             if (price.getPrice() > maxPrice) {
                 maxPrice = price.getPrice();
@@ -30,8 +30,8 @@ public class Price {
         return maxPrice;
     }
 
-    public static float getMinPrice(ArrayList<Price> priceList){
-        float minPrice = 1000000000;
+    public static double getMinPrice(ArrayList<Price> priceList){
+        double minPrice = 1000000000;
         for (Price price : priceList) {
             if (price.getPrice() < minPrice) {
                 minPrice = price.getPrice();
@@ -40,9 +40,9 @@ public class Price {
         return minPrice;
     }
 
-    public static float getDiffPrice(ArrayList<Price> priceList){
-        float maxPrice = Price.getMaxPrice(priceList);
-        float minPrice = Price.getMinPrice(priceList);
+    public static double getDiffPrice(ArrayList<Price> priceList){
+        double maxPrice = Price.getMaxPrice(priceList);
+        double minPrice = Price.getMinPrice(priceList);
         return maxPrice - minPrice;
     }
 
@@ -54,7 +54,7 @@ public class Price {
         this.cId = cId;
     }
 
-    public Integer getPrice() {
+    public double getPrice() {
         return price;
     }
 

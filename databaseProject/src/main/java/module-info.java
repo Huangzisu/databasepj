@@ -6,5 +6,6 @@ module com.example.databaseproject {
 
 
     opens com.example.databaseproject to javafx.fxml;
+    opens Entity to javafx.base;
     exports com.example.databaseproject;
 }
