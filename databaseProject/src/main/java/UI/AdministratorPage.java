@@ -30,22 +30,16 @@ public class AdministratorPage {
         gridPane.setAlignment(Pos.CENTER);
 
         // 添加组件
-        addButton(gridPane, "修改用户信息", () -> showUpdateUserPopup(stage));
-        addButton(gridPane, "修改商家信息", () -> showUpdateShopPopup(stage));
-        addButton(gridPane, "修改商品信息", () -> showUpdateCommodityPopup(stage));
-        addButton(gridPane, "查询最受欢迎的商品", () -> showMostPopularCommodity(stage));
+        Utils.addButton(gridPane, "修改用户信息", () -> showUpdateUserPopup(stage));
+        Utils.addButton(gridPane, "修改商家信息", () -> showUpdateShopPopup(stage));
+        Utils.addButton(gridPane, "修改商品信息", () -> showUpdateCommodityPopup(stage));
+        Utils.addButton(gridPane, "查询最受欢迎的商品", () -> showMostPopularCommodity(stage));
 
         // 设置场景和舞台
         Scene scene = new Scene(gridPane, 300, 200);
         stage.setScene(scene);
         stage.setTitle("管理员界面");
         stage.show();
-    }
-
-    private static void addButton(GridPane gridPane, String buttonText, Runnable action) {
-        Button button = new Button(buttonText);
-        button.setOnAction(event -> action.run());
-        gridPane.add(button, 1, gridPane.getRowCount());
     }
 
     private static void showUpdateUserPopup(Stage stage) {
@@ -81,7 +75,7 @@ public class AdministratorPage {
 
             // 在此处执行修改用户信息的逻辑，你可以调用相应的方法或写逻辑代码
             Integer result = UserInterface.updateUserInfo(Integer.parseInt(userId), userName, Integer.parseInt(userAge), userPhone, userGender);
-            alertUpdateResult(popupStage, result);
+            Utils.alertUpdateResult(popupStage, result);
             // 关闭弹出窗口
             popupStage.close();
         });
@@ -142,7 +136,7 @@ public class AdministratorPage {
                 int result = ShopInterface.updateShopInfo(Integer.parseInt(shopId), shopName, shopLocation);
 
                 // 显示更新结果的消息窗口
-                alertUpdateResult(popupStage, result);
+                Utils.alertUpdateResult(popupStage, result);
                 popupStage.close();
             } catch (Exception ex) {
                 ex.printStackTrace(); // 这里可以根据实际情况处理异常
@@ -227,7 +221,7 @@ public class AdministratorPage {
                 );
 
                 // 显示更新结果的消息窗口
-                alertUpdateResult(stage, result);
+                Utils.alertUpdateResult(stage, result);
             } catch (Exception ex) {
                 ex.printStackTrace(); // 这里可以根据实际情况处理异常
             }
@@ -270,12 +264,12 @@ public class AdministratorPage {
             // 在此处执行查询最受欢迎商品的逻辑，返回商品信息的结果
             Integer mostPopularCommodityId = CollectionInterface.getMostPopularCommodityId();
             if(mostPopularCommodityId == -1){
-                alertQueryFailure(stage);
+                Utils.alertQueryFailure(stage);
                 return;
             }
             DetailedCommodity commodity = CommodityInterface.getDetailedCommodityInfo(mostPopularCommodityId);
             if(commodity == null){
-                alertQueryFailure(stage);
+                Utils.alertQueryFailure(stage);
                 return;
             }
             // 创建弹出窗口
@@ -300,27 +294,5 @@ public class AdministratorPage {
         }
     }
 
-    private static void alertUpdateResult(Stage stage, int result) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.initOwner(stage);
 
-        if (result == 1) {
-            alert.setTitle("成功");
-            alert.setHeaderText("用户信息已成功更新");
-            alert.setContentText("用户信息已经成功更新到数据库。");
-        } else {
-            alert.setTitle("失败");
-            alert.setHeaderText("更新用户信息失败");
-            alert.setContentText("更新用户信息时发生错误。");
-        }
-        alert.showAndWait();
-    }
-
-    private static void alertQueryFailure(Stage stage){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.initOwner(stage);
-        alert.setTitle("失败");
-        alert.setContentText("查询失败");
-        alert.showAndWait();
-    }
 }

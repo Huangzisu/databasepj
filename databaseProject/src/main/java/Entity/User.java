@@ -25,6 +25,14 @@ public class User {
         this.role = -1;
         this.gender = "unknown";
     }
+    public User(Integer id, String name, Integer age, String phoneNumber, Integer role, String gender){
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.gender = gender;
+    }
     public int getId() {
         return id;
     }

@@ -7,6 +7,7 @@ import SqlOperation.SqlConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 /**
  * @Description：
@@ -30,5 +31,23 @@ public class PlatformInterface {
             e.printStackTrace();
         }
         return platform;
+    }
+
+    public static ArrayList<Platform> getAllPlatforms() {
+        ArrayList<Platform> platforms = new ArrayList<>();
+        try {
+            Connection conn = SqlConnection.getConnection();
+            String sql = "SELECT * FROM platform";
+            PreparedStatement ptmt = conn.prepareStatement(sql);
+            ResultSet rs = ptmt.executeQuery();
+            while (rs.next()) {
+                Platform platform = new Platform(rs.getInt("id"), rs.getString("name"));
+                platforms.add(platform);
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return platforms;
     }
 }
