@@ -8,12 +8,15 @@ public class Commodity {
 
     private String platform;
 
-    public Commodity(int id, String name, int price, String shop, String platform) {
+    private String origin;
+
+    public Commodity(int id, String name, int price, String shop, String platform, String origin) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.shop = shop;
         this.platform = platform;
+        this.origin = origin;
     }
 
     public int getId() {
@@ -34,5 +37,12 @@ public class Commodity {
 
     public String getPlatform() {
         return platform;
+    }
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 }

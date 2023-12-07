@@ -33,6 +33,24 @@ public class ShopInterface {
         return shop;
     }
 
+    public static Shop getShopInfoByName(String name){
+        Shop shop = null;
+        try{
+            Connection conn = SqlConnection.getConnection();
+            String sql = "select * from shop where name = ? LIMIT 1";
+            PreparedStatement ptmt = conn.prepareStatement(sql);
+            ptmt.setString(1, name);
+            ResultSet rs = ptmt.executeQuery();
+            while (rs.next()) {
+                shop = new Shop(rs.getInt("id"), rs.getString("name"), rs.getString("address"), rs.getInt("owner_id"));
+            }
+            conn.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return shop;
+    }
+
     public static Integer updateShopInfo(Integer id, String name, String address){
         Integer result = 0;
         try{

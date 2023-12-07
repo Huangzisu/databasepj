@@ -1,5 +1,6 @@
 package com.example.databaseproject;
 
+import UI.AdministratorPage;
 import UI.LoginPage;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +12,8 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
-        LoginPage.LoginPage(primaryStage);
+//        LoginPage.LoginPage(primaryStage);
+        AdministratorPage.showAdministratorPage(primaryStage);
         // 创建标签
     }
     public static void main(String[] args) {

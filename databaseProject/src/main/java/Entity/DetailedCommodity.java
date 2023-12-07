@@ -12,8 +12,8 @@ public class DetailedCommodity extends Commodity {
     private String productionDate;
     private String shopName;
 
-    public DetailedCommodity(int id, String name, int price, String shop, String platform, String category, String description, String productionDate, String shopName, String shopAddress) {
-        super(id, name, price, shop, platform);
+    public DetailedCommodity(int id, String name, int price, String shop, String platform, String origin, String category, String description, String productionDate, String shopName, String shopAddress) {
+        super(id, name, price, shop, platform, origin);
         this.category = category;
         this.description = description;
         this.productionDate = productionDate;
