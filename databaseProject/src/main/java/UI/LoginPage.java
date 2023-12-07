@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+import static UI.AdministratorPage.showAdministratorPage;
+import static UI.UserPage.showUserPage;
+
 public class LoginPage {
     public static void LoginPage(Stage stage){
         Label labelId = new Label("ID:");
@@ -40,6 +43,10 @@ public class LoginPage {
                     alert.setHeaderText("登录成功");
                     alert.setContentText("欢迎您，"+user.getName()+",您的身份是"+UserType[user.getRole()]);
                     alert.show();
+                    switch(user.getRole()){
+                        case 2:showAdministratorPage(stage);break;
+                        case 0:showUserPage(stage,user);break;
+                    }
                 }
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);

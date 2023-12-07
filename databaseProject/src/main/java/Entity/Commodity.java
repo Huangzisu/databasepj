@@ -3,14 +3,15 @@ package Entity;
 public class Commodity {
     private int id;
     private String name;
-    private int price;
+    private double price;
     private String shop;
 
     private String platform;
 
     private String origin;
 
-    public Commodity(int id, String name, int price, String shop, String platform, String origin) {
+
+    public Commodity(int id, String name, double price, String shop, String platform,String origin) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -27,7 +28,7 @@ public class Commodity {
         return name;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -40,9 +41,5 @@ public class Commodity {
     }
     public String getOrigin() {
         return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
     }
 }

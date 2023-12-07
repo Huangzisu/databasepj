@@ -30,16 +30,6 @@ public class UserInterface {
     }
 
 
-
-    public static void getUserInfo(User user){
-        System.out.println("id:"+user.getId());
-        System.out.println("name:"+user.getName());
-        System.out.println("age:"+user.getAge());
-        System.out.println("phoneNumber:"+user.getPhoneNumber());
-        System.out.println("role:"+user.getRole());
-        System.out.println("gender:"+user.getGender());
-    }
-
     public static Integer updateUserInfo(Integer id, String name, Integer age, String phoneNumber, String gender) {
         Integer result = 0;
         try{
