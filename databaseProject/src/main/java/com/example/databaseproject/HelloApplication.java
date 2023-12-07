@@ -1,6 +1,7 @@
 package com.example.databaseproject;
 
 import Entity.User;
+import UI.AdministratorPage;
 import UI.LoginPage;
 import UI.ShopOwnerPage;
 import UI.UserPage;
@@ -16,7 +17,7 @@ public class HelloApplication extends Application {
 //        AdministratorPage.showAdministratorPage(primaryStage);
         ShopOwnerPage shopOwnerPage = new ShopOwnerPage();
         shopOwnerPage.showShopOwnerPage(primaryStage);
-        UserPage.showUserPage(primaryStage,new User());
+//        UserPage.showUserPage(primaryStage,new User());
         // 创建标签
     }
     public static void main(String[] args) {
