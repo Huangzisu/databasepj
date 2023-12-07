@@ -72,7 +72,7 @@ public class CommodityInterface {
             conn = SqlConnection.getConnection();
             // 关闭自动提交
             conn.setAutoCommit(false);
-            String insertCommoditySql = "INSERT INTO commodity (name, category, description, produceDate, origin" +
+            String insertCommoditySql = "INSERT INTO commodity (name, category, description, produceDate, origin, " +
                     "s_id, p_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             // 插入新商品
             PreparedStatement insertCommodityStmt = conn.prepareStatement(insertCommoditySql, Statement.RETURN_GENERATED_KEYS);

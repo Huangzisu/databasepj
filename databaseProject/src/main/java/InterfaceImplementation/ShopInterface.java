@@ -1,6 +1,7 @@
 package InterfaceImplementation;
 
 import Entity.Message;
+import Entity.Platform;
 import Entity.Price;
 import Entity.Shop;
 import SqlOperation.SqlConnection;
@@ -49,6 +50,43 @@ public class ShopInterface {
             e.printStackTrace();
         }
         return shop;
+    }
+
+    public static ArrayList<Shop> getAllShops(){
+        ArrayList<Shop> shops = new ArrayList<>();
+        try {
+            Connection conn = SqlConnection.getConnection();
+            String sql = "SELECT * FROM shop";
+            PreparedStatement ptmt = conn.prepareStatement(sql);
+            ResultSet rs = ptmt.executeQuery();
+            while (rs.next()) {
+                Shop shop = new Shop(rs.getInt("id"), rs.getString("name"), rs.getString("address"), rs.getInt("owner_id"));
+                shops.add(shop);
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return shops;
+    }
+
+    public static ArrayList<Shop> getShopsByOwnerId(Integer ownerId) {
+        ArrayList<Shop> shops = new ArrayList<>();
+        try {
+            Connection conn = SqlConnection.getConnection();
+            String sql = "SELECT * FROM shop WHERE owner_id = ?";
+            PreparedStatement ptmt = conn.prepareStatement(sql);
+            ptmt.setInt(1, ownerId);
+            ResultSet rs = ptmt.executeQuery();
+            while (rs.next()) {
+                Shop shop = new Shop(rs.getInt("id"), rs.getString("name"), rs.getString("address"), rs.getInt("owner_id"));
+                shops.add(shop);
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return shops;
     }
 
     public static Integer updateShopInfo(Integer id, String name, String address){

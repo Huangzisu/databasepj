@@ -51,4 +51,25 @@ public class UserInterface {
         }
         return 1;
     }
+
+    public static User getUserById(Integer id){
+        User user = null;
+        try{
+            Connection con = SqlConnection.getConnection();
+            String sql = "SELECT * FROM user WHERE id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            ResultSet result = pstmt.executeQuery();
+            while(result.next()){
+                user = new User(result.getInt("id"), result.getString("name"), result.getInt("age"),
+                        result.getString("phoneNumber"), result.getInt("role"), result.getString("gender"));
+            }
+            pstmt.close();
+            con.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return user;
+    }
 }
