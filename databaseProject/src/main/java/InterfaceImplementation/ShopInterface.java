@@ -2,6 +2,7 @@ package InterfaceImplementation;
 
 
 import Entity.Shop;
+import Entity.User;
 import SqlOperation.SqlConnection;
 
 
@@ -172,6 +173,32 @@ public class ShopInterface {
             }
         }
         return 1;
+    }
+    public static Integer insertNewShop(String name, String address, Integer ownerId){
+        Integer generatedId = 0;
+        // 检查 owner 身份
+        User owner = UserInterface.getUserById(ownerId);
+        if(owner == null || owner.getRole() != 1){
+            return 0;
+        }
+        try{
+            Connection con = SqlConnection.getConnection();
+            String sql = "INSERT INTO shop(name, address, owner_id) VALUES(?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1,name);
+            pstmt.setString(2,address);
+            pstmt.setInt(3, ownerId);
+            pstmt.executeUpdate();
+            ResultSet generatedKeys = pstmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                generatedId = generatedKeys.getInt(1);
+            }
+            pstmt.close();
+            con.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return generatedId;
     }
 }
 

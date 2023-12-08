@@ -45,6 +45,7 @@ public class AdministratorPage {
         Utils.addButton(gridPane, "新增用户", () -> showInsertUserPopup(stage));
         Utils.addButton(gridPane, "删除用户", () -> showDeleteUserPopup(stage));
         Utils.addButton(gridPane, "删除商店", () -> showDeleteShopPopup(stage));
+        Utils.addButton(gridPane, "新增商店", () -> showInsertShopPopup(stage));
 
         // 设置场景和舞台
         Scene scene = new Scene(gridPane, 300, 200);
@@ -577,5 +578,61 @@ public class AdministratorPage {
 
         // 显示弹窗
         deletePopupStage.showAndWait();
+    }
+    public static void showInsertShopPopup(Stage primaryStage) {
+        // 创建弹出窗口
+        Stage insertPopupStage = new Stage();
+        insertPopupStage.initModality(Modality.APPLICATION_MODAL);
+        insertPopupStage.initOwner(primaryStage);
+        insertPopupStage.setTitle("新增商店");
+
+        // 创建布局
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10));
+
+        // 添加标签和文本框
+        Label nameLabel = new Label("商店名称:");
+        TextField nameTextField = new TextField();
+
+        Label addressLabel = new Label("商店地址:");
+        TextField addressTextField = new TextField();
+
+        Label ownerIdLabel = new Label("拥有者ID:");
+        TextField ownerIdTextField = new TextField();
+
+        // 创建确认按钮
+        Button confirmButton = new Button("确认新增");
+        confirmButton.setOnAction(event -> {
+            // 获取用户输入的商店信息
+            String name = nameTextField.getText();
+            String address = addressTextField.getText();
+            try {
+                Integer ownerId = Integer.parseInt(ownerIdTextField.getText());
+
+                // 调用新增商店的操作
+                Integer result = ShopInterface.insertNewShop(name, address, ownerId);
+
+                // 显示新增结果
+                Utils.alertInsertShopResult(result);
+
+                // 关闭新增商店窗口
+                insertPopupStage.close();
+            } catch (NumberFormatException e) {
+                // 处理非法输入，弹窗提示用户输入正确的拥有者ID
+                Utils.alertIsInt(ownerIdTextField.getText());
+            }
+        });
+
+        // 将标签、文本框和按钮添加到布局
+        vBox.getChildren().addAll(nameLabel, nameTextField, addressLabel, addressTextField, ownerIdLabel, ownerIdTextField, confirmButton);
+
+        // 创建场景和设置弹窗标题
+        Scene insertPopupScene = new Scene(vBox);
+        insertPopupStage.setScene(insertPopupScene);
+        insertPopupStage.setTitle("新增商店");
+
+        // 显示弹窗
+        insertPopupStage.showAndWait();
     }
 }
