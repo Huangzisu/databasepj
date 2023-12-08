@@ -33,4 +33,20 @@ public class MessageInterface {
         }
         return messages;
     }
+
+    public static Integer deleteMessageByUserId(Connection con, Integer userId){
+        Integer result = -1;
+        try{
+            String sql = "DELETE FROM message WHERE u_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1,userId);
+            result = pstmt.executeUpdate();
+            pstmt.close();
+            if(result < 1)  return -1;
+        }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
 }

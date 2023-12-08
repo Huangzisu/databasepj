@@ -107,5 +107,73 @@ public class ShopInterface {
         }
         return 1;
     }
+
+    public static Integer deleteShopByOwnerId(Connection con, Integer id){
+        // 根据商家id删除商店
+        Integer resultShop = -1;
+        Integer resultCommodity = -1;
+        try {
+            ArrayList<Shop> shops = ShopInterface.getShopsByOwnerId(id);
+            for(Shop shop : shops){
+                resultCommodity = CommodityInterface.deleteCommodityByShopId(con, shop.getId());
+            }
+            String sql = "DELETE FROM shop WHERE owner_id = ?";
+            PreparedStatement ptmt = con.prepareStatement(sql);
+            ptmt.setInt(1, id);
+            resultShop = ptmt.executeUpdate();
+            ptmt.close();
+            if(resultShop < 0 || resultCommodity == -1){
+                return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+    public static Integer deleteShopById(Integer id){
+        // 根据商家id删除商店
+        Integer resultCommodity = -1;
+        Integer resultShop = -1;
+        Connection con = null;
+        try {
+            con = SqlConnection.getConnection();
+            con.setAutoCommit(false);
+            resultCommodity = CommodityInterface.deleteCommodityByShopId(con, id);
+            if(resultCommodity == -1){
+                con.rollback();
+                con.close();
+                return -1;
+            }
+            String sql = "DELETE FROM shop WHERE id = ?";
+            PreparedStatement ptmt = con.prepareStatement(sql);
+            ptmt.setInt(1, id);
+            resultShop = ptmt.executeUpdate();
+            ptmt.close();
+            if(resultShop < 1){
+                con.rollback();
+                con.close();
+                return -1;
+            }
+            con.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try{
+                con.rollback();
+            }catch (Exception e1){
+                e1.printStackTrace();
+                return -1;
+            }
+            return -1;
+        }finally {
+            try{
+                con.close();
+            }catch (Exception e){
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        return 1;
+    }
 }
 
