@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import Entity.Price;
-import Entity.User;
+
 import java.util.ArrayList;
 
 import static InterfaceImplementation.CommodityInterface.getCommodityPriceHistory;
@@ -34,11 +34,8 @@ public class PriceInterface {
         return result;
     }
 
-    public static ArrayList<Price> getHistoryPrice(Integer cId, User user,int option) throws SQLException, ClassNotFoundException {
-        ArrayList<Price> priceArrayList = new ArrayList<>();
-        if(user.getRole() !=0){
-            return priceArrayList;
-        }
+    public static ArrayList<Price> getHistoryPrice(Integer cId,int option) throws SQLException, ClassNotFoundException {
+        ArrayList<Price> priceArrayList;
         Connection con = SqlConnection.getConnection();
         priceArrayList = getCommodityPriceHistory(con,cId,option);
         return priceArrayList;

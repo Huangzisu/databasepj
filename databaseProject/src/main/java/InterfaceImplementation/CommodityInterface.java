@@ -186,7 +186,7 @@ public class CommodityInterface {
         ArrayList<Price> priceArrayList = new ArrayList<>();
         try {
             // 查询目标商品价格历史，判断是否满足更新条件
-            String selectPriceSql = "SELECT * FROM price WHERE c_id = ?"+timeRange[option]+" ORDER BY time DESC";
+            String selectPriceSql = "SELECT * FROM price WHERE c_id = ? " + timeRange[option] + " ORDER BY `time` ASC";
 
             PreparedStatement selectPriceStmt = conn.prepareStatement(selectPriceSql);
             selectPriceStmt.setInt(1, id);

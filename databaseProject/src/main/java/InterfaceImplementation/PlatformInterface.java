@@ -1,7 +1,6 @@
 package InterfaceImplementation;
 
 import Entity.Platform;
-import Entity.Shop;
 import SqlOperation.SqlConnection;
 
 import java.sql.Connection;

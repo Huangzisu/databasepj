@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 
 import static UI.AdministratorPage.showAdministratorPage;
+import static UI.ShopOwnerPage.showShopOwnerPage;
 import static UI.UserPage.showUserPage;
 
 public class LoginPage {
@@ -46,6 +47,7 @@ public class LoginPage {
                     switch(user.getRole()){
                         case 2:showAdministratorPage(stage);break;
                         case 0:showUserPage(stage,user);break;
+                        case 1:showShopOwnerPage(stage);break;
                     }
                 }
             } catch (SQLException ex) {

@@ -1,12 +1,10 @@
 package InterfaceImplementation;
 
-import Entity.Message;
-import Entity.Platform;
-import Entity.Price;
+
 import Entity.Shop;
 import SqlOperation.SqlConnection;
 
-import javax.swing.*;
+
 import java.sql.*;
 import java.util.ArrayList;
 
