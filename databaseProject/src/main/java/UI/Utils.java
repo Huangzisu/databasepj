@@ -46,6 +46,13 @@ public class Utils {
         }
         alert.showAndWait();
     }
+    public static void alertDoubleInput(Stage stage){
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("警告");
+        alert.setHeaderText("价格输入错误");
+        alert.setContentText("请输入一个大于0的正数作为商品价格！");
+        alert.showAndWait();
+    }
     public static void addButton(GridPane gridPane, String buttonText, Runnable action) {
         Button button = new Button(buttonText);
         button.setOnAction(event -> action.run());
