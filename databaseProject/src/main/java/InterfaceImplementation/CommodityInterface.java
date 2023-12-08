@@ -64,9 +64,49 @@ public class CommodityInterface {
             return null;
         }
     }
+    public static ArrayList<DetailedCommodity> getAllCommoditiesByShopId(Integer id) {
+        ArrayList<DetailedCommodity> commodities = new ArrayList<>();
+        try {
+            Connection conn = SqlConnection.getConnection();
 
+            // 修改 SQL 查询语句
+            String sql = "SELECT t1.id, t1.name as commodityName, t1.category, t1.produceDate, t1.description, t1.origin, t2.name as platformName, t3.name as shopName, t3.address, t4.price "
+                    + "FROM commodity t1 "
+                    + "INNER JOIN platform t2 ON t1.p_id = t2.id "
+                    + "INNER JOIN shop t3 ON t1.s_id = t3.id "
+                    + "INNER JOIN price t4 ON t4.c_id = t1.id "
+                    + "WHERE t3.id = ? AND t4.time = ( "
+                    + "    SELECT MAX(time) "
+                    + "    FROM price "
+                    + "    WHERE c_id = t1.id)";
+
+            try (PreparedStatement ptmt = conn.prepareStatement(sql)) {
+                ptmt.setInt(1, id);
+                ResultSet rs = ptmt.executeQuery();
+                while (rs.next()) {
+                    DetailedCommodity commodity = new DetailedCommodity(
+                            rs.getInt("id"),
+                            rs.getString("commodityName"),
+                            rs.getDouble("price"),
+                            rs.getString("shopName"),
+                            rs.getString("platformName"),
+                            rs.getString("origin"),
+                            rs.getString("category"),
+                            rs.getString("description"),
+                            rs.getString("produceDate"),
+                            rs.getString("address")
+                    );
+                    commodities.add(commodity);
+                }
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return commodities;
+    }
     public static Integer releaseNewCommodity(String name, String category, String description,
-                                              String produceDate, String origin, Integer shopId, Integer price, Integer platformId) {
+                                              String produceDate, String origin, Integer shopId, Double price, Integer platformId) {
         Connection conn = null;
         try {
             conn = SqlConnection.getConnection();
@@ -144,7 +184,7 @@ public class CommodityInterface {
         return 1;
     }
 
-    public static Integer updateCommodityPrice(Integer id, Integer price) {
+    public static Integer updateCommodityPrice(Integer id, Double price) {
         Integer result = 0;
         try {
             Connection conn = SqlConnection.getConnection();
@@ -165,7 +205,7 @@ public class CommodityInterface {
 
             PreparedStatement updateCommodityStmt = conn.prepareStatement(insertPriceSql);
             updateCommodityStmt.setInt(1, id);
-            updateCommodityStmt.setInt(2, price);
+            updateCommodityStmt.setDouble(2, price);
 
             result = updateCommodityStmt.executeUpdate();
             conn.close();
