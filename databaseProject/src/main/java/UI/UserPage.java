@@ -1,6 +1,8 @@
 package UI;
 
 import Entity.*;
+import InterfaceImplementation.CollectionInterface;
+import SqlOperation.SqlConnection;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static InterfaceImplementation.CollectionInterface.addCollectionCommodity;
+import static InterfaceImplementation.CollectionInterface.*;
 import static InterfaceImplementation.CommodityInterface.getDetailedCommodityInfo;
 import static InterfaceImplementation.CommodityInterface.searchCommodity;
 import static InterfaceImplementation.MessageInterface.getMessageByUserId;
@@ -37,23 +40,123 @@ public class UserPage {
         Button btnUserInfo = new Button("用户信息查询");
         Button btnSearchProduct = new Button("商品搜索");
         Button btnViewMessages = new Button("查看消息列表");
+        Button btnCollection = new Button("查看收藏商品");
 
         // 为按钮添加事件处理（示例）
         btnUserInfo.setOnAction(event -> showUserInfo(user));
         btnSearchProduct.setOnAction(event -> showSearchProductPage(user));
         btnViewMessages.setOnAction(event->showMessageList(user.getId()));
+        btnCollection.setOnAction(event-> {
+            try {
+                showCollectionPage(user);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
         // 其他按钮类似...
 
         // 创建布局
         VBox layout = new VBox(20); // 10是按钮之间的间距
         layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(btnUserInfo, btnSearchProduct, btnViewMessages);
+        layout.getChildren().addAll(btnUserInfo, btnSearchProduct, btnViewMessages,btnCollection);
 
         // 设置舞台和场景
         Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);
         stage.setTitle("用户页面");
         stage.show();
+    }
+
+    private static void showCollectionPage(User user) throws SQLException, ClassNotFoundException {
+        Stage stage = new Stage();
+        TableView<Collection> table = new TableView<>();
+
+        TableColumn<Collection, String> nameColumn = new TableColumn<>("商品名");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<Collection, String> shopColumn = new TableColumn<>("店铺");
+        shopColumn.setCellValueFactory(new PropertyValueFactory<>("shopName"));
+
+        TableColumn<Collection, String> platformColumn = new TableColumn<>("平台");
+        platformColumn.setCellValueFactory(new PropertyValueFactory<>("platformName"));
+
+        TableColumn<Collection, Double> floorPriceColumn = new TableColumn<>("底价");
+        floorPriceColumn.setCellValueFactory(new PropertyValueFactory<>("floorPrice"));
+
+        table.getColumns().addAll(nameColumn, shopColumn, platformColumn, floorPriceColumn);
+
+        ArrayList<Collection> collections = getCollectionList(user.getId());
+        table.setItems(FXCollections.observableArrayList(collections));
+
+        // 行点击事件
+        table.setRowFactory(tv -> {
+            TableRow<Collection> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getClickCount() == 1) {
+                    Collection selectedCollection = row.getItem();
+                    showCollectionEditDialog(selectedCollection,user);
+                }
+            });
+            return row;
+        });
+
+        Scene scene = new Scene(new VBox(table), 500, 400);
+        stage.setScene(scene);
+        stage.setTitle("收藏列表");
+        stage.show();
+    }
+    private static void showCollectionEditDialog(Collection collection, User user) {
+        Stage dialogStage = new Stage();
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+
+        TextField floorPriceField = new TextField(String.valueOf(collection.getFloorPrice()));
+        floorPriceField.setPromptText("修改底价");
+
+        Button updateButton = new Button("确认修改");
+        updateButton.setOnAction(event -> {
+            try {
+                double newFloorPrice = Double.parseDouble(floorPriceField.getText());
+                int result = changeFloorPrice(user.getId(), collection.getC_id(), newFloorPrice);
+                if (result == 1) {
+                    showAlert("修改成功", Alert.AlertType.INFORMATION);
+                } else {
+                    showAlert("修改失败", Alert.AlertType.ERROR);
+                }
+            } catch (NumberFormatException e) {
+                showAlert("请输入有效的底价", Alert.AlertType.ERROR);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        Button deleteButton = new Button("删除收藏");
+        deleteButton.setOnAction(event -> {
+            int result = 0;
+            try {
+                result = deleteSpecificCollection(user.getId(), collection.getC_id());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            if (result == 1) {
+                showAlert("删除成功", Alert.AlertType.INFORMATION);
+            } else {
+                showAlert("删除失败", Alert.AlertType.ERROR);
+            }
+        });
+
+        layout.getChildren().addAll(new Label("修改底价:"), floorPriceField, updateButton, deleteButton);
+
+        Scene scene = new Scene(layout, 300, 200);
+        dialogStage.setScene(scene);
+        dialogStage.setTitle("编辑收藏");
+        dialogStage.show();
     }
 
     private static void showUserInfo(User user) {
