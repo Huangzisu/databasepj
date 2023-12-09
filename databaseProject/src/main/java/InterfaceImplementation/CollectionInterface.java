@@ -68,4 +68,35 @@ public class CollectionInterface {
         }
         return resultId;
     }
+
+    public static Integer deleteCollectionByUserId(Connection con, Integer userId){
+        Integer result = -1;
+        try{
+            String sql = "DELETE FROM collection WHERE u_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1,userId);
+            result = pstmt.executeUpdate();
+            pstmt.close();
+            if(result < 0)  return -1;
+        }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+    public static Integer deleteCollectionByCommodityId(Connection con, Integer commodityId){
+        Integer result = -1;
+        try{
+            String sql = "DELETE FROM collection WHERE c_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1,commodityId);
+            result = pstmt.executeUpdate();
+            pstmt.close();
+            if(result < 0)  return -1;
+        }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
 }

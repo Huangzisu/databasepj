@@ -41,4 +41,20 @@ public class PriceInterface {
         return priceArrayList;
     }
 
+    public static Integer deletePriceByCommodityId(Connection con, Integer id){
+        Integer result = -1;
+        try{
+            String sql = "DELETE FROM price WHERE c_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1,id);
+            result = pstmt.executeUpdate();
+            pstmt.close();
+            if(result < 0)  return -1;
+        }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+
 }

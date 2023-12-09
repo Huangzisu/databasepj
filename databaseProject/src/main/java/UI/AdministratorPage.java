@@ -1,18 +1,25 @@
 package UI;
 
 import Entity.DetailedCommodity;
+import Entity.User;
 import InterfaceImplementation.CommodityInterface;
 import InterfaceImplementation.ShopInterface;
 import InterfaceImplementation.UserInterface;
 import InterfaceImplementation.CollectionInterface;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.scene.control.DatePicker;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -34,6 +41,11 @@ public class AdministratorPage {
         Utils.addButton(gridPane, "修改商家信息", () -> showUpdateShopPopup(stage));
         Utils.addButton(gridPane, "修改商品信息", () -> showUpdateCommodityPopup(stage));
         Utils.addButton(gridPane, "查询最受欢迎的商品", () -> showMostPopularCommodity(stage));
+        Utils.addButton(gridPane, "查看所有用户信息", () -> showAllUsersPopup(stage));
+        Utils.addButton(gridPane, "新增用户", () -> showInsertUserPopup(stage));
+        Utils.addButton(gridPane, "删除用户", () -> showDeleteUserPopup(stage));
+        Utils.addButton(gridPane, "删除商店", () -> showDeleteShopPopup(stage));
+        Utils.addButton(gridPane, "新增商店", () -> showInsertShopPopup(stage));
 
         // 设置场景和舞台
         Scene scene = new Scene(gridPane, 300, 200);
@@ -294,5 +306,333 @@ public class AdministratorPage {
         }
     }
 
+    public static void showInsertUserPopup(Stage primaryStage) {
+        // 创建新增用户窗口的布局
+        GridPane root = new GridPane();
+        root.setPadding(new Insets(10));
+        root.setHgap(10);
+        root.setVgap(10);
 
+        // 添加标签和文本框
+        Label nameLabel = new Label("姓名:");
+        TextField nameTextField = new TextField();
+
+        Label ageLabel = new Label("年龄:");
+        TextField ageTextField = new TextField();
+
+        Label phoneNumberLabel = new Label("电话号码:");
+        TextField phoneNumberTextField = new TextField();
+
+        Label roleLabel = new Label("身份:");
+        TextField roleTextField = new TextField();
+
+        Label passwordLabel = new Label("密码:");
+        TextField passwordTextField = new TextField();
+
+        Label genderLabel = new Label("性别:");
+        TextField genderTextField = new TextField();
+
+        // 添加所有控件到布局中
+        root.add(nameLabel, 0, 0);
+        root.add(nameTextField, 1, 0);
+        root.add(ageLabel, 0, 1);
+        root.add(ageTextField, 1, 1);
+        root.add(phoneNumberLabel, 0, 2);
+        root.add(phoneNumberTextField, 1, 2);
+        root.add(roleLabel, 0, 3);
+        root.add(roleTextField, 1, 3);
+        root.add(passwordLabel, 0, 4);
+        root.add(passwordTextField, 1, 4);
+        root.add(genderLabel, 0, 5);
+        root.add(genderTextField, 1, 5);
+
+        // 创建确认按钮
+        Button confirmButton = new Button("确认新增");
+        confirmButton.setOnAction(event -> {
+            // 获取用户输入的信息
+            String name = nameTextField.getText();
+            String age = ageTextField.getText();
+            String phoneNumber = phoneNumberTextField.getText();
+            Utils.alertIsInt(age);
+            Integer ageInt = Integer.parseInt(age);
+            Utils.alertIsInt(phoneNumber);
+            String role = roleTextField.getText();
+            String password = passwordTextField.getText();
+            String gender = genderTextField.getText();
+            Integer roleInt = 0;
+            if(role.equals("商家")){
+                roleInt = 1;
+            } else if(role.equals("管理员")){
+                roleInt = 2;
+            }
+
+            // 调用新增用户的函数
+            Integer userId = UserInterface.insertNewUser(name, ageInt, phoneNumber, roleInt, password, gender);
+
+            // 显示用户新增结果的弹窗
+            Utils.alertInsertUserResult(userId);
+
+            // 关闭新增用户窗口
+            primaryStage.close();
+        });
+
+        // 将确认按钮添加到布局中
+        root.add(confirmButton, 1, 6);
+
+        // 创建新增用户窗口的场景
+        Scene scene = new Scene(root, 400, 300);
+
+        // 创建新增用户窗口的舞台
+        Stage insertUserStage = new Stage();
+        insertUserStage.setTitle("新增用户");
+        insertUserStage.setScene(scene);
+
+        // 设置新增用户窗口的 Modality 和 Owner
+        insertUserStage.initModality(Modality.APPLICATION_MODAL);
+        insertUserStage.initOwner(primaryStage);
+
+        // 显示新增用户窗口
+        insertUserStage.showAndWait();
+    }
+
+    public static void showAllUsersPopup(Stage primaryStage) {
+        // 获取所有非管理员用户信息
+        ArrayList<User> users = UserInterface.getAllUserNotAdministrator();
+
+        // 创建表格形式的布局
+        TableView<User> tableView = new TableView<>();
+
+        // 创建表格的列
+        TableColumn<User, Integer> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn<User, String> nameColumn = new TableColumn<>("姓名");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<User, Integer> ageColumn = new TableColumn<>("年龄");
+        ageColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
+
+        TableColumn<User, String> phoneNumberColumn = new TableColumn<>("电话号码");
+        phoneNumberColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+
+        TableColumn<User, Integer> roleColumn = new TableColumn<>("角色");
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+
+        TableColumn<User, String> genderColumn = new TableColumn<>("性别");
+        genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
+
+        TableColumn<User, String> passwordColumn = new TableColumn<>("密码");
+        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
+
+        // 将列添加到表格
+        tableView.getColumns().addAll(idColumn, nameColumn, ageColumn, phoneNumberColumn, roleColumn, genderColumn, passwordColumn);
+
+        // 将用户数据添加到表格
+        ObservableList<User> observableUsers = FXCollections.observableArrayList(users);
+        tableView.setItems(observableUsers);
+
+        // 创建弹出窗口
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.initOwner(primaryStage);
+
+        // 创建布局
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10));
+
+        // 添加表格到布局
+        vBox.getChildren().add(tableView);
+
+        // 创建确认按钮
+        Button confirmButton = new Button("确定");
+        confirmButton.setOnAction(event -> popupStage.close());
+
+        // 添加确认按钮到布局
+        vBox.getChildren().add(confirmButton);
+
+        // 设置布局到场景
+        Scene scene = new Scene(vBox);
+        popupStage.setScene(scene);
+
+        // 设置弹出窗口标题
+        popupStage.setTitle("所有用户信息");
+
+        // 显示弹出窗口
+        popupStage.showAndWait();
+    }
+
+    public static void showDeleteUserPopup(Stage primaryStage) {
+        // 创建弹出窗口
+        Stage deletePopupStage = new Stage();
+        deletePopupStage.initModality(Modality.APPLICATION_MODAL);
+        deletePopupStage.initOwner(primaryStage);
+        deletePopupStage.setTitle("删除用户");
+
+        // 创建布局
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10));
+
+        // 添加标签和文本框
+        Label idLabel = new Label("需要删除的用户ID:");
+        TextField idTextField = new TextField();
+
+        // 创建确认按钮
+        Button confirmButton = new Button("确认删除");
+        confirmButton.setOnAction(event -> {
+            // 获取用户输入的ID
+            try {
+                Integer userId = Integer.parseInt(idTextField.getText());
+
+                // 显示确认弹窗
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initModality(Modality.APPLICATION_MODAL);
+                alert.initOwner(primaryStage);
+                alert.setTitle("确认删除");
+                alert.setHeaderText("确认删除用户？");
+                alert.setContentText("您确定要删除用户ID为 " + userId + " 的用户吗？");
+
+                // 显示确认弹窗并等待用户响应
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        // 用户点击确认，执行删除用户的操作
+                        Integer result = UserInterface.deleteUser(userId);
+
+                        // 显示删除结果
+                        Utils.alertDeleteResult(primaryStage, result);
+                    }
+                });
+            } catch (NumberFormatException e) {
+                // 处理非法输入，弹窗提示用户输入正确的ID
+                Utils.alertIsInt(idTextField.getText());
+            }
+        });
+
+        // 将标签、文本框和按钮添加到布局
+        vBox.getChildren().addAll(idLabel, idTextField, confirmButton);
+
+        // 创建场景和设置弹窗标题
+        Scene deletePopupScene = new Scene(vBox);
+        deletePopupStage.setScene(deletePopupScene);
+        deletePopupStage.setTitle("删除用户");
+
+        // 显示弹窗
+        deletePopupStage.showAndWait();
+    }
+
+    public static void showDeleteShopPopup(Stage primaryStage) {
+        // 创建弹出窗口
+        Stage deletePopupStage = new Stage();
+        deletePopupStage.initModality(Modality.APPLICATION_MODAL);
+        deletePopupStage.initOwner(primaryStage);
+        deletePopupStage.setTitle("删除商店");
+
+        // 创建布局
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10));
+
+        // 添加标签和文本框
+        Label idLabel = new Label("商店ID:");
+        TextField idTextField = new TextField();
+
+        // 创建确认按钮
+        Button confirmButton = new Button("确认删除");
+        confirmButton.setOnAction(event -> {
+            // 获取用户输入的商店ID
+            try {
+                Integer shopId = Integer.parseInt(idTextField.getText());
+
+                // 创建确认弹窗
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initModality(Modality.APPLICATION_MODAL);
+                alert.initOwner(primaryStage);
+                alert.setTitle("确认删除");
+                alert.setHeaderText("确认删除商店？");
+                alert.setContentText("您确定要删除商店ID为 " + shopId + " 的商店吗？");
+
+                // 显示确认弹窗并等待用户响应
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        // 用户点击确认，执行删除商店的操作
+                        Integer result = ShopInterface.deleteShopById(shopId);
+
+                        // 显示删除结果
+                        Utils.alertDeleteResult(primaryStage, result);
+                    }
+                });
+            } catch (NumberFormatException e) {
+                // 处理非法输入，弹窗提示用户输入正确的商店ID
+                Utils.alertIsInt(idTextField.getText());
+            }
+        });
+
+        // 将标签、文本框和按钮添加到布局
+        vBox.getChildren().addAll(idLabel, idTextField, confirmButton);
+
+        // 创建场景和设置弹窗标题
+        Scene deletePopupScene = new Scene(vBox);
+        deletePopupStage.setScene(deletePopupScene);
+        deletePopupStage.setTitle("删除商店");
+
+        // 显示弹窗
+        deletePopupStage.showAndWait();
+    }
+    public static void showInsertShopPopup(Stage primaryStage) {
+        // 创建弹出窗口
+        Stage insertPopupStage = new Stage();
+        insertPopupStage.initModality(Modality.APPLICATION_MODAL);
+        insertPopupStage.initOwner(primaryStage);
+        insertPopupStage.setTitle("新增商店");
+
+        // 创建布局
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10));
+
+        // 添加标签和文本框
+        Label nameLabel = new Label("商店名称:");
+        TextField nameTextField = new TextField();
+
+        Label addressLabel = new Label("商店地址:");
+        TextField addressTextField = new TextField();
+
+        Label ownerIdLabel = new Label("拥有者ID:");
+        TextField ownerIdTextField = new TextField();
+
+        // 创建确认按钮
+        Button confirmButton = new Button("确认新增");
+        confirmButton.setOnAction(event -> {
+            // 获取用户输入的商店信息
+            String name = nameTextField.getText();
+            String address = addressTextField.getText();
+            try {
+                Integer ownerId = Integer.parseInt(ownerIdTextField.getText());
+
+                // 调用新增商店的操作
+                Integer result = ShopInterface.insertNewShop(name, address, ownerId);
+
+                // 显示新增结果
+                Utils.alertInsertShopResult(result);
+
+                // 关闭新增商店窗口
+                insertPopupStage.close();
+            } catch (NumberFormatException e) {
+                // 处理非法输入，弹窗提示用户输入正确的拥有者ID
+                Utils.alertIsInt(ownerIdTextField.getText());
+            }
+        });
+
+        // 将标签、文本框和按钮添加到布局
+        vBox.getChildren().addAll(nameLabel, nameTextField, addressLabel, addressTextField, ownerIdLabel, ownerIdTextField, confirmButton);
+
+        // 创建场景和设置弹窗标题
+        Scene insertPopupScene = new Scene(vBox);
+        insertPopupStage.setScene(insertPopupScene);
+        insertPopupStage.setTitle("新增商店");
+
+        // 显示弹窗
+        insertPopupStage.showAndWait();
+    }
 }

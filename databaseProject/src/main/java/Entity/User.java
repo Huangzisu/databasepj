@@ -17,6 +17,12 @@ public class User {
 
     private String gender;
 
+    public String getPassword() {
+        return password;
+    }
+
+    private String password;
+
     public User() {
         this.id = 00000000;
         this.name = "未登录";
@@ -24,6 +30,7 @@ public class User {
         this.phoneNumber = "00000000000";
         this.role = -1;
         this.gender = "unknown";
+        this.password = "";
     }
     public User(Integer id, String name, Integer age, String phoneNumber, Integer role, String gender){
         this.id = id;
@@ -32,6 +39,16 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.role = role;
         this.gender = gender;
+        this.password = "";
+    }
+    public User(Integer id, String name, Integer age, String phoneNumber, Integer role, String gender, String password){
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.gender = gender;
+        this.password = password;
     }
     public int getId() {
         return id;

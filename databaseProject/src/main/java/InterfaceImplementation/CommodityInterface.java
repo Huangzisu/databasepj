@@ -283,6 +283,36 @@ public class CommodityInterface {
         return 1;
     }
 
+    public static Integer deleteCommodityByShopId(Connection con, Integer shopId) {
+        int result = -1;
+        ArrayList<DetailedCommodity> commodities = getAllCommoditiesByShopId(shopId);
+        if(commodities.size() == 0){
+            return 1;
+        }
+        Integer resultCollection = -1;
+        Integer resultPrice = -1;
+        for(DetailedCommodity commodity : commodities){
+            resultCollection = CollectionInterface.deleteCollectionByCommodityId(con, commodity.getId());
+            resultPrice = PriceInterface.deletePriceByCommodityId(con, commodity.getId());
+            if(resultCollection == -1 || resultPrice == -1){
+                return -1;
+            }
+        }
+        try {
+            // 删除商店下的所有商品
+            String sql = "DELETE FROM commodity WHERE s_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, shopId);
+            result = pstmt.executeUpdate();
+            pstmt.close();
+            if(result < 0)  return -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+
     public static Timestamp convertToTimestamp(String timestampString) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

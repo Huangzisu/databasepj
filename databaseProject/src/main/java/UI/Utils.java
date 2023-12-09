@@ -33,6 +33,19 @@ public class Utils {
         }
         alert.showAndWait();
     }
+    public static void alertDeleteResult(Stage stage, int result) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.initOwner(stage);
+
+        if (result == 1) {
+            alert.setTitle("成功");
+            alert.setContentText("删除成功！");
+        } else {
+            alert.setTitle("失败");
+            alert.setContentText("删除失败！");
+        }
+        alert.showAndWait();
+    }
     public static void alertReleaseResult(Stage stage, int result){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.initOwner(stage);
@@ -52,6 +65,52 @@ public class Utils {
         alert.setHeaderText("价格输入错误");
         alert.setContentText("请输入一个大于0的正数作为商品价格！");
         alert.showAndWait();
+    }
+    public static void alertInsertUserResult(Integer userId) {
+        // 创建用户新增结果的弹窗
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("新增用户结果");
+
+        if (userId != 0) {
+            // 插入成功，显示用户新增的id
+            alert.setHeaderText("用户新增成功");
+            alert.setContentText("新增用户的ID为: " + userId);
+        } else {
+            // 插入失败
+            alert.setHeaderText("用户新增失败");
+            alert.setContentText("请检查输入信息并重试");
+        }
+
+        // 显示弹窗
+        alert.showAndWait();
+    }
+    public static void alertInsertShopResult(Integer shopId) {
+        // 创建用户新增结果的弹窗
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("新增商店结果");
+
+        if (shopId != 0) {
+            // 插入成功，显示用户新增的id
+            alert.setHeaderText("商店新增成功");
+            alert.setContentText("新增商店的ID为: " + shopId);
+        } else {
+            // 插入失败
+            alert.setHeaderText("商店新增失败");
+            alert.setContentText("请检查输入信息并重试");
+        }
+
+        // 显示弹窗
+        alert.showAndWait();
+    }
+    public static void alertIsInt(String numberStr){
+        try{
+            Integer test = Integer.parseInt(numberStr);
+        }catch (Exception e){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("警告");
+            alert.setContentText("请输入正确数字");
+            alert.showAndWait();
+        }
     }
     public static void addButton(GridPane gridPane, String buttonText, Runnable action) {
         Button button = new Button(buttonText);
