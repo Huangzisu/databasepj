@@ -26,9 +26,9 @@ import java.util.ArrayList;
  **/
 public class ShopOwnerPage {
     private static User user;
-    public ShopOwnerPage() {
-//        this.user = user;
-        this.user = UserInterface.getUserById(10000002);
+    public ShopOwnerPage(User user) {
+        this.user = user;
+//        this.user = UserInterface.getUserById(10000002);
     }
     public static void showShopOwnerPage(Stage stage) {
         // 创建布局

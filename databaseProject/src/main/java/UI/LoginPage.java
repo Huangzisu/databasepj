@@ -47,7 +47,10 @@ public class LoginPage {
                     switch(user.getRole()){
                         case 2:showAdministratorPage(stage);break;
                         case 0:showUserPage(stage,user);break;
-                        case 1:showShopOwnerPage(stage);break;
+                        case 1:
+                            ShopOwnerPage shopOwnerPage = new ShopOwnerPage(user);
+                            shopOwnerPage.showShopOwnerPage(stage);
+                            break;
                     }
                 }
             } catch (SQLException ex) {
