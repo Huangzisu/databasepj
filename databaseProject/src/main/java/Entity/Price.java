@@ -46,11 +46,11 @@ public class Price {
         return maxPrice - minPrice;
     }
 
-    public Integer getcId() {
+    public Integer getCId() {
         return cId;
     }
 
-    public void setcId(Integer cId) {
+    public void setCId(Integer cId) {
         this.cId = cId;
     }
 

@@ -99,6 +99,7 @@ public class CollectionInterface {
             e.printStackTrace();
             return -1;
         }
+        System.out.println(commodityId);
         return 1;
     }
 

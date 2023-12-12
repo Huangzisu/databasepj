@@ -35,6 +35,47 @@ public class CommodityInterface {
         return commodityArrayList;
     }
 
+    public static ArrayList<DetailedCommodity> searchDetailedCommodity(String name){
+        ArrayList<DetailedCommodity> commodityArrayList = new ArrayList<>();
+        try{
+            Connection con = SqlConnection.getConnection();
+            String sql = "SELECT t1.id, t1.name as commodityName, t1.category, t1.produceDate, t1.description, t1.origin, t2.name as platformName, t3.name as shopName, t3.address, t4.price "
+                    + "FROM commodity t1 "
+                    + "INNER JOIN platform t2 ON t1.p_id = t2.id "
+                    + "INNER JOIN shop t3 ON t1.s_id = t3.id "
+                    + "INNER JOIN price t4 ON t4.c_id = t1.id "
+                    + "WHERE t1.name LIKE ? AND t4.time = ( "
+                    + "    SELECT MAX(time) "
+                    + "    FROM price "
+                    + "    WHERE c_id = t1.id)";
+
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, "%" + name + "%");  // 正确的方式，不需要额外的单引号
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                do{
+                    commodityArrayList.add(new DetailedCommodity(
+                            rs.getInt("id"),
+                            rs.getString("commodityName"),
+                            rs.getDouble("price"),
+                            rs.getString("shopName"),
+                            rs.getString("platformName"),
+                            rs.getString("origin"),
+                            rs.getString("category"),
+                            rs.getString("description"),
+                            rs.getString("produceDate"),
+                            rs.getString("address")
+                    ));
+                }while(rs.next());
+            }
+            pstmt.close();
+            con.close();
+        }catch (Exception e){
+        }
+
+        return commodityArrayList;
+    }
+
     public static DetailedCommodity getDetailedCommodityInfo(int id) throws SQLException, ClassNotFoundException {
         Connection con = SqlConnection.getConnection();
         String sql = "SELECT t1.id, t1.name as commodityName, t1.category, t1.produceDate, t1.description, t1.origin, t2.name as platformName, t3.name as shopName, t3.address, t4.price "
@@ -244,7 +285,6 @@ public class CommodityInterface {
         return priceArrayList;
     }
 
-
     public static Integer administratorUpdateCommodityInfo(Integer id, String name, String category, String description,
                                                            String produceDate, String origin, String shopName, String platformName) {
         Integer result = 0;
@@ -283,6 +323,47 @@ public class CommodityInterface {
         return 1;
     }
 
+    public static ArrayList<DetailedCommodity> getAllCommodity(){
+        ArrayList<DetailedCommodity> commodities = new ArrayList<>();
+        try {
+            Connection conn = SqlConnection.getConnection();
+
+            // 修改 SQL 查询语句
+            String sql = "SELECT t1.id, t1.name as commodityName, t1.category, t1.produceDate, t1.description, t1.origin, t2.name as platformName, t3.name as shopName, t3.address, t4.price "
+                    + "FROM commodity t1 "
+                    + "INNER JOIN platform t2 ON t1.p_id = t2.id "
+                    + "INNER JOIN shop t3 ON t1.s_id = t3.id "
+                    + "INNER JOIN price t4 ON t4.c_id = t1.id "
+                    + "WHERE t4.time = ( "
+                    + "    SELECT MAX(time) "
+                    + "    FROM price "
+                    + "    WHERE c_id = t1.id)";
+
+            try (PreparedStatement ptmt = conn.prepareStatement(sql)) {
+                ResultSet rs = ptmt.executeQuery();
+                while (rs.next()) {
+                    DetailedCommodity commodity = new DetailedCommodity(
+                            rs.getInt("id"),
+                            rs.getString("commodityName"),
+                            rs.getDouble("price"),
+                            rs.getString("shopName"),
+                            rs.getString("platformName"),
+                            rs.getString("origin"),
+                            rs.getString("category"),
+                            rs.getString("description"),
+                            rs.getString("produceDate"),
+                            rs.getString("address")
+                    );
+                    commodities.add(commodity);
+                }
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return commodities;
+    }
+
     public static Integer deleteCommodityByShopId(Connection con, Integer shopId) {
         int result = -1;
         ArrayList<DetailedCommodity> commodities = getAllCommoditiesByShopId(shopId);
@@ -311,6 +392,118 @@ public class CommodityInterface {
             return -1;
         }
         return 1;
+    }
+    public static Integer deleteCommodityById(Integer id){
+        int result = -1;
+        Connection con = null;
+        try {
+            con = SqlConnection.getConnection();
+            con.setAutoCommit(false);
+            Integer resultCollection = -1;
+            Integer resultPrice = -1;
+            resultCollection = CollectionInterface.deleteCollectionByCommodityId(con, id);
+            resultPrice = PriceInterface.deletePriceByCommodityId(con, id);
+            if(resultCollection == -1 || resultPrice == -1){
+                con.rollback();
+                con.close();
+                return -1;
+            }
+            // 删除商品
+            String sql = "DELETE FROM commodity WHERE id = ?";
+            try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+                pstmt.setInt(1, id);
+                result = pstmt.executeUpdate();
+            }
+            if (result < 1) {
+                con.rollback();
+                con.close();
+                return -1; // 删除失败
+            }
+            con.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try{
+                con.rollback();
+            }catch (Exception e1){
+                e1.printStackTrace();
+                return -1;
+            }
+            return -1;
+        }finally {
+            try{
+                con.close();
+            }catch (Exception e){
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        return 1; // 删除成功
+    }
+    public static Integer deleteCommodityById(Connection con, Integer id){
+        int result = -1;
+        try {
+            Integer resultCollection = -1;
+            Integer resultPrice = -1;
+            resultCollection = CollectionInterface.deleteCollectionByCommodityId(con, id);
+            resultPrice = PriceInterface.deletePriceByCommodityId(con, id);
+            if(resultCollection == -1 || resultPrice == -1){
+                return -1;
+            }
+            // 删除商品
+            String sql = "DELETE FROM commodity WHERE id = ?";
+            try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+                pstmt.setInt(1, id);
+                result = pstmt.executeUpdate();
+            }
+            if (result < 1) {
+                return -1; // 删除失败
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 1; // 删除成功
+    }
+    public static ArrayList<DetailedCommodity> getAllCommoditiesByPlatformId(Integer id){
+        ArrayList<DetailedCommodity> commodities = new ArrayList<>();
+        try {
+            Connection conn = SqlConnection.getConnection();
+
+            // 修改 SQL 查询语句
+            String sql = "SELECT t1.id, t1.name as commodityName, t1.category, t1.produceDate, t1.description, t1.origin, t2.name as platformName, t3.name as shopName, t3.address, t4.price "
+                    + "FROM commodity t1 "
+                    + "INNER JOIN platform t2 ON t1.p_id = t2.id "
+                    + "INNER JOIN shop t3 ON t1.s_id = t3.id "
+                    + "INNER JOIN price t4 ON t4.c_id = t1.id "
+                    + "WHERE t2.id = ? AND t4.time = ( "
+                    + "    SELECT MAX(time) "
+                    + "    FROM price "
+                    + "    WHERE c_id = t1.id)";
+
+            try (PreparedStatement ptmt = conn.prepareStatement(sql)) {
+                ptmt.setInt(1, id);
+                ResultSet rs = ptmt.executeQuery();
+                while (rs.next()) {
+                    DetailedCommodity commodity = new DetailedCommodity(
+                            rs.getInt("id"),
+                            rs.getString("commodityName"),
+                            rs.getDouble("price"),
+                            rs.getString("shopName"),
+                            rs.getString("platformName"),
+                            rs.getString("origin"),
+                            rs.getString("category"),
+                            rs.getString("description"),
+                            rs.getString("produceDate"),
+                            rs.getString("address")
+                    );
+                    commodities.add(commodity);
+                }
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return commodities;
     }
 
     public static Timestamp convertToTimestamp(String timestampString) {
