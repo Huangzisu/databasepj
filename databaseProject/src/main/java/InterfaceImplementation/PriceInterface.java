@@ -3,9 +3,7 @@ package InterfaceImplementation;
 
 import SqlOperation.SqlConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 import Entity.Price;
 
@@ -51,6 +49,44 @@ public class PriceInterface {
             pstmt.close();
             if(result < 0)  return -1;
         }catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+    public static Integer updatePrice(Integer c_id, Double price, Timestamp time, Timestamp newTime){
+        try (Connection connection = SqlConnection.getConnection()) {
+            String sql = "UPDATE price SET price = ?, time = ? WHERE c_id = ? AND time = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setDouble(1, price);
+                preparedStatement.setTimestamp(2, newTime);
+                preparedStatement.setInt(3, c_id);
+                preparedStatement.setTimestamp(4, time);
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected < 0) {
+                    return -1;
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+    public static Integer deletePrice(Integer c_id, Timestamp time){
+        Integer rowsAffected = -1;
+        try  {
+            Connection conn = SqlConnection.getConnection();
+            String sql = "DELETE FROM price WHERE c_id = ? AND time = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, c_id);
+                pstmt.setTimestamp(2, time);
+                rowsAffected = pstmt.executeUpdate();
+                if(rowsAffected < 1){
+                    return -1;
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return -1;
         }

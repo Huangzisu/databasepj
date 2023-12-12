@@ -98,7 +98,23 @@ public class Utils {
             alert.setHeaderText("商店新增失败");
             alert.setContentText("请检查输入信息并重试");
         }
+        // 显示弹窗
+        alert.showAndWait();
+    }
+    public static void alertInsertPlatformResult(Integer shopId) {
+        // 创建用户新增结果的弹窗
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("新增平台结果");
 
+        if (shopId != 0) {
+            // 插入成功，显示用户新增的id
+            alert.setHeaderText("平台新增成功");
+            alert.setContentText("新增平台的ID为: " + shopId);
+        } else {
+            // 插入失败
+            alert.setHeaderText("平台新增失败");
+            alert.setContentText("请检查输入信息并重试");
+        }
         // 显示弹窗
         alert.showAndWait();
     }
@@ -112,9 +128,30 @@ public class Utils {
             alert.showAndWait();
         }
     }
+    public static void alertIsDouble(){
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("警告");
+        alert.setContentText("请输入正确数字");
+        alert.showAndWait();
+    }
     public static void addButton(GridPane gridPane, String buttonText, Runnable action) {
         Button button = new Button(buttonText);
         button.setOnAction(event -> action.run());
         gridPane.add(button, 1, gridPane.getRowCount());
+    }
+    public static int convertOptionToValue(String selectedOption) {
+        // 将选项转换为对应的值
+        switch (selectedOption) {
+            case "所有日期":
+                return 0;
+            case "近一星期":
+                return 1;
+            case "近一月":
+                return 2;
+            case "近一年":
+                return 3;
+            default:
+                return 0; // 默认为所有日期
+        }
     }
 }
